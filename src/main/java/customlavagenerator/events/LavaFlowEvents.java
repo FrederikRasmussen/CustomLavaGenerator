@@ -61,7 +61,7 @@ public class LavaFlowEvents {
     if (Blocks.FLOWING_LAVA == event.getOriginalState().getBlock()) {
       World world = event.getWorld();
       BlockPos lavaPosition = event.getLiquidPos();
-      if (0 == getBlockMeta(world, lavaPosition)) {
+      if (0 == getFluidLevel(world, lavaPosition)) {
         return;
       }
       findWater(
@@ -70,10 +70,9 @@ public class LavaFlowEvents {
         lavaPosition.east(),
         lavaPosition.south(),
         lavaPosition.west())
-          .map(position -> getBlockMeta(world, position))
-          //.ifPresent(level -> Block.getBlockFromName("minecraft:stone").getStateFromMeta(5));
+          .map(position -> getFluidLevel(world, position))
+          .map(level -> level % blocks.size())
           .ifPresent(level -> event.setNewState(blocks.get(level).get()));
-          //.ifPresent(blockMeta -> placeBlock(world, event, blockMeta));
     }
   }
 
@@ -107,7 +106,7 @@ public class LavaFlowEvents {
     }
   }
 
-  private int getBlockMeta(World world, BlockPos position) {
+  private int getFluidLevel(World world, BlockPos position) {
     return world
         .getBlockState(position)
         .getValue(BlockFluidBase.LEVEL);
